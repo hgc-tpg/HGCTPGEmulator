@@ -197,7 +197,10 @@ std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > TCmap_out;
 
 Stage1TruncationConfig SAConfigParser::parseCfg(const std::string theCfgFile) const {
   /*
-    Parser for Stage 1 configuration
+    Parser for Stage 1 configuration 
+    
+    RapidJSON (https://github.com/Tencent/rapidjson/)
+    
     Currently handling a fixed set of parameters:
     doTruncation=[true,false]
     rozMin=Value (double)
@@ -206,48 +209,65 @@ Stage1TruncationConfig SAConfigParser::parseCfg(const std::string theCfgFile) co
     maxTCsPerBin={Value1,Value2,...} (std::vector<unsigned>)
     phiSectorEdges={Value1,Value2,...} (std::vector<double>)
   */
-  //cfg param:
-  bool doTruncation;
-  double rozMin, rozMax;
-  unsigned rozBins;
-  std::vector<unsigned> maxTCsPerBin;
-  std::vector<double> phiSectorEdges;
-  std::ifstream theCfg(theCfgFile);
-  if (!theCfg.is_open()) throw std::runtime_error("Could not open config file.");
 
-  std::string line;
-  while (std::getline(theCfg,line)) {
-    if(line[0]=='#' || line.empty())
- 	    continue;
-    auto delimPos = line.find("=");
-    std::string name = line.substr(0,delimPos);
-    std::string value = line.substr(delimPos+1);
-    // bool
-    if (name == "doTruncation")
-      doTruncation = (value=="1");
-    //single values
-    if (name == "rozMin")
-      rozMin = (double)atof(value.c_str());
-    if (name == "rozMax")
-      rozMax = (double)atof(value.c_str());
-    if (name == "rozBins")
-      rozBins = (unsigned)atof(value.c_str());
-    // vectors
-    if (name == "maxTCsPerBin"){
-      std::stringstream iss(value);
-      unsigned number;
-      while ( iss >> number ) {
-        maxTCsPerBin.push_back(number);
-      }
-    }
-    if (name == "phiSectorEdges") {
-      std::stringstream iss(value);
-      double number;
-      while (iss >> number) {
-        phiSectorEdges.push_back(number);
-      }
-    }
-  }
+  // Read json file into string
+  std::ifstream ifs(theCfgFile);
+  std::string jsonContent( (std::istreambuf_iterator<char>(ifs) ),
+			   (std::istreambuf_iterator<char>()    ) );
+
+  // Parse string into rapidjson Document
+  rapidjson::Document theCfg;
+  std::cout << "jsonContent: " << std::endl << jsonContent << std::endl << "///////////"<< std::endl;
+  //if (theCfg.Parse(jsonContent.c_str()).HasParseError()) {
+  //  throw std::runtime_error("Could not parse json config.");
+  //}
+   theCfg.Parse(jsonContent.c_str());
+
+  // Access values in theCfg 
+  assert(theCfg.IsObject());
+  
+  // - doTruncation (bool)
+  assert(theCfg.HasMember("doTruncation"));
+  assert(theCfg["doTruncation"].IsBool());
+  bool doTruncation = theCfg["doTruncation"].GetBool();
+  std::cout << "doTruncation="<<doTruncation<<std::endl;
+  
+  // - rozMin/rozMax (double)
+  assert(theCfg.HasMember("rozMin"));
+  assert(theCfg["rozMin"].IsDouble());
+  double rozMin = theCfg["rozMin"].GetDouble();
+  std::cout << "rozMin="<<rozMin<<std::endl;
+  
+
+  assert(theCfg.HasMember("rozMax"));
+  assert(theCfg["rozMax"].IsDouble());
+  double rozMax = theCfg["rozMax"].GetDouble();
+  std::cout << "rozMax="<<rozMax<<std::endl;
+
+  // - rozBins (unsigned)
+  assert(theCfg.HasMember("rozBins"));
+  assert(theCfg["rozBins"].IsInt());
+  unsigned rozBins = theCfg["rozBins"].GetInt();
+  std::cout << "rozBins="<<rozBins<<std::endl;
+
+  // - maxTCsPerBin (vector<unsigned>) from an array
+  assert(theCfg.HasMember("maxTCsPerBin"));
+  const rapidjson::Value& theArray = theCfg["maxTCsPerBin"];
+  assert(theArray.IsArray());
+  std::vector<unsigned> maxTCsPerBin;
+  for (rapidjson::Value::ConstValueIterator itr = theArray.Begin(); itr != theArray.End(); ++itr)
+    maxTCsPerBin.push_back(itr->GetInt());
+    
+  // - phiSectorEdges (vector<double>) from an array
+  assert(theCfg.HasMember("phiSectorEdges"));
+  const rapidjson::Value& theEdgesArray = theCfg["phiSectorEdges"];
+  assert(theEdgesArray.IsArray());
+  std::vector<double> phiSectorEdges;
+  for (rapidjson::Value::ConstValueIterator itr = theEdgesArray.Begin(); itr != theEdgesArray.End(); ++itr)
+    phiSectorEdges.push_back(itr->GetDouble());
+
+  // Fill in CMSSW-format config
   Stage1TruncationConfig theConfig(doTruncation, rozMin, rozMax, rozBins, maxTCsPerBin, phiSectorEdges);
   return theConfig;
+
 }
