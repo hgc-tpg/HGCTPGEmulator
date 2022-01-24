@@ -4,6 +4,10 @@
 #include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalStage1TruncationConfig_SA.h"
 #include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalTriggerCell_SA.h"
 
+#include "HGCTPGEmulator/interface/rapidjson/document.h"
+#include "HGCTPGEmulator/interface/rapidjson/prettywriter.h"
+
+
 #include <iostream>
 #include <fstream>
 #include <sstream>

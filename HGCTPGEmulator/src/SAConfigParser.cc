@@ -164,8 +164,9 @@ std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > SAConfigParse
 /*
   TCmap reader from LLR S1 firmware generator configuration
 */
-std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > TCmap_out;
+  std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > TCmap_out;
   std::ifstream TCMap(theTCMap);
+  std::cout<<theTCMap<<std::endl;
   if (!TCMap.is_open()) throw std::runtime_error("Could not open TC map.");
   std::string tc, colname;
   std::string tcline;
@@ -197,10 +198,7 @@ std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > TCmap_out;
 
 Stage1TruncationConfig SAConfigParser::parseCfg(const std::string theCfgFile) const {
   /*
-    Parser for Stage 1 configuration 
-    
-    RapidJSON (https://github.com/Tencent/rapidjson/)
-    
+    Parser for Stage 1 configuration
     Currently handling a fixed set of parameters:
     doTruncation=[true,false]
     rozMin=Value (double)
@@ -217,11 +215,9 @@ Stage1TruncationConfig SAConfigParser::parseCfg(const std::string theCfgFile) co
 
   // Parse string into rapidjson Document
   rapidjson::Document theCfg;
-  std::cout << "jsonContent: " << std::endl << jsonContent << std::endl << "///////////"<< std::endl;
-  //if (theCfg.Parse(jsonContent.c_str()).HasParseError()) {
-  //  throw std::runtime_error("Could not parse json config.");
-  //}
-   theCfg.Parse(jsonContent.c_str());
+  if (theCfg.Parse(jsonContent.c_str()).HasParseError()) {
+    throw std::runtime_error("Could not parse json config.");
+  }
 
   // Access values in theCfg 
   assert(theCfg.IsObject());
