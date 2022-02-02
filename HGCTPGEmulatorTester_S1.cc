@@ -41,7 +41,7 @@ int main(int argc, char **argv) {
   Stage1TruncationConfig config = cfgReader.parseCfg(cfgfile);
 
   //	create algo instance
-  HGCalStage1TruncationImplEmulator theAlgo;
+  HGCalStage1TruncationImplSA theAlgo;
 
   // Outputs
   std::ofstream inputTCsFile;
