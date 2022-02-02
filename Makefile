@@ -17,7 +17,7 @@ OBJDIR = obj
 OBJ = HGCTPGEmulatorTester_S1.o $(patsubst %$(SRCSUF), %$(OBJSUF), $(SRC))
 
 CC = g++
-CCFLAGS = -std=c++1y -I./ -I../ -I$(HDRDIR_EMUL) -I$(HDRDIR_TEST)
+CCFLAGS = -std=c++1y -I./ -I../ -I$(HDRDIR_EMUL) -I$(HDRDIR_TEST) $$(pkg-config nlohmann_json --cflags)
 
 ##########################################################
 

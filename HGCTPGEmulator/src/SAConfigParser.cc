@@ -4,7 +4,7 @@ using namespace l1thgcfirmware;
 
 SAConfigParser::SAConfigParser() {}
 
-std::vector< std::vector <HGCalTriggerCell> > SAConfigParser::parseTClist(const std::string theInputFile) const {
+std::vector< std::vector <HGCalTriggerCell> > SAConfigParser::parseTClist(const std::string& theInputFile) const {
   /*
     TC reader for input format defined by Emyr
     Mostly there to avoid the hard coded "include" of the TC list, passing it instead as an argument to the exe
@@ -18,6 +18,8 @@ std::vector< std::vector <HGCalTriggerCell> > SAConfigParser::parseTClist(const 
   std::cout << "///////////////////////" << std::endl
             << "Getting input TCs from " << theInputFile << ": " << std::endl << std::endl;
   std::string line;
+
+  int tcid=0;
   while (std::getline(theFile,line)) {
     if(line[0]=='#' || line.empty())
       continue;
@@ -26,8 +28,8 @@ std::vector< std::vector <HGCalTriggerCell> > SAConfigParser::parseTClist(const 
     } else if (line[0]=='}') { // '}' marking end of new vector
       TCs_out.push_back(TCs_tmp);
       TCs_tmp.clear();
+      tcid=0;
     } else { // actuall TC info
-
       // getting only hex values from line
       std::string value = line.erase(0,line.find('(')+1); // removing  "l1thgcfirmware::HGCalTriggerCell("
       value.resize(value.size()-2); //removing '), at end of line'
@@ -43,15 +45,18 @@ std::vector< std::vector <HGCalTriggerCell> > SAConfigParser::parseTClist(const 
                              (unsigned)std::stoi(tmpTCcontent.at(2).c_str(),0,16),
                              (unsigned)std::stoi(tmpTCcontent.at(3).c_str(),0,16),
                              (unsigned)std::stoi(tmpTCcontent.at(4).c_str(),0,16),
-                             (unsigned)std::stoi(tmpTCcontent.at(5).c_str(),0,16));
+                             (unsigned)std::stoi(tmpTCcontent.at(5).c_str(),0,16),
+			     tcid);
       TCs_tmp.push_back(tmpTC);
+      tmpTC.setIndex(tcid);
+      tcid++;
       tmpTCcontent.clear();
     }
   }
   return TCs_out;
 }
 
-std::vector< std::vector <HGCalTriggerCell> > SAConfigParser::parseTClist(const std::string theInputFile, const std::string theTCMap) const {
+std::vector< std::vector <HGCalTriggerCell> > SAConfigParser::parseTClist(const std::string& theInputFile, const std::string& theTCMap) const {
   /*
     TC reader for 'Mod_stimuli' files
   */
@@ -65,109 +70,80 @@ std::vector< std::vector <HGCalTriggerCell> > SAConfigParser::parseTClist(const 
   std::ifstream theFile(theInputFile);
   if (!theFile.is_open()) throw std::runtime_error("Could not open Mod_stimuli list.");
 
-  std::string tc_line;
+  json theTCjson;
+  theFile >> theTCjson;
+  int evt=0;
+  std::cout << "Event " << evt << ":" << std::endl;
+  // loop on events
+  for (auto& event: theTCjson.at("event")) {
 
-  std::cout << "looping on tc input file lines" << std::endl;
-  bool firstline=true;
-  while (std::getline(theFile,tc_line)) {
-    /* Here each line should be a string of 48 space-separated hex values corresponding to the TC energies. */
+    std::cout << "Event " << evt << ":" << std::endl;
 
-    if(tc_line[0]=='#' || tc_line.empty()) continue; // skip commented/empty lines
+    // loop on modules
+    for (json::iterator moduleIt = event.at("module").begin(); moduleIt != event.at("module").end(); ++moduleIt) {
 
-    if(tc_line[0]!='E'){ // "Module" line: fill event's TC vector
+      // store module hash
+      unsigned moduleHash = atoi(moduleIt.key().c_str());
+      json moduleTcs = event.at("module")[moduleIt.key()];
 
-      // split line into "module hash" and "TC energies":
-      unsigned module_hash = 0;
-      std::string line_bit;
-      std::stringstream tcline(tc_line);
+      std::cout << "Module " << moduleHash << ": ";
 
-      while (std::getline(tcline, line_bit, ':')) {
+      // loop on TCs in module
+      unsigned tcid = 0;
+      for (const std::string& tc: moduleTcs.at("tc")) {
 
-        if(line_bit[0]=='M') { //the bit is 'ModuleXXXX '
+	// get rz/phi values from map
+	std::pair<unsigned,unsigned> modHash_tcid{moduleHash,tcid};
+	auto roz_phi= TCmap_out.find(modHash_tcid);
 
-          // extract module hash
-          std::string value = line_bit.erase(0,line_bit.find('e')+1); // removing  "Module"
-          value.resize(value.size()-1); // removing trailing space
-          module_hash = atoi(value.c_str()); // save hash as unsigned
+	// fill TC object
+	if (roz_phi!=TCmap_out.end()) { // check if mapping entry exists
 
-        } else { // the bit is the list of TC energies
+	  HGCalTriggerCell tmpTC(true, //not important for S1?
+				 true, //not important for S1?
+				 (4096/0.7)*std::get<0>(roz_phi->second), //roverz (w/ magic numbers)
+				 (4096/0.7)*std::get<1>(roz_phi->second), //phi (w/ magic numbers)
+				 50, //layer - dummy for now, to correct (although not used for S1)
+				 (unsigned)std::stoi(tc.c_str(),0,16), // energy
+				 tcid); // id_cmssw
+	  tmpTC.setIndex(tcid);
+	  // fill event's TC vector
+	  TCs_tmp.push_back(tmpTC);
 
-          // getting only hex values from line
-          std::string value = line_bit.erase(0,1); // remove space at start
-          std::stringstream iss(line_bit);
-          std::istream_iterator<std::string> begin(iss);
-          std::istream_iterator<std::string> end;
-          std::vector<std::string> tmpTCcontent(begin, end); // store TC energy list in string vector
+	  std::cout << tmpTC.energy()<< ",";
+	  tcid++;
 
-          // loop on TC vector and fill TC objects
-          unsigned tcid = 0;
-          std::cout << "mod"<<module_hash<<" : ";
-          for (const auto& value: tmpTCcontent) {
+	} else { // no mapping info found
 
-            // get rz/phi values from map
-            std::pair<unsigned,unsigned> modHash_tcid{module_hash,tcid};
-            auto roz_phi= TCmap_out.find(modHash_tcid);
+	  std::cout <<"X,";
+	  tcid++;
 
-            // fill TC object
-            if (roz_phi!=TCmap_out.end()) { // check if mapping entry exists
-              HGCalTriggerCell tmpTC(true, //not important for S1?
-                                     true, //not important for S1?
-                                     (4096/0.7)*std::get<0>(roz_phi->second), //roverz (w/ magic numbers)
-                                     (4096/0.7)*std::get<1>(roz_phi->second), //phi (w/ magic numbers)
-                                     50, //layer - dummy for now, to correct (although not used for S1)
-                                     (unsigned)std::stoi(value.c_str(),0,16)); // energy
-
-              // fill event's TC vector
-              TCs_tmp.push_back(tmpTC);
-
-              std::cout << tmpTC.energy()<< ",";
-              tcid++;
-
-            } else { // no mapping info found
-
-              std::cout <<"X,";
-              tcid++;
-
-            } // end if-else 'check if mapping entry exists'
-          } // end loop on TCs
-
-          std::cout << std::endl;
-
-        } //end if-else 'line_bit'
-      } //end loop 'line_bit'
-
-    } else { // "Event line": store previous event's TC vector
-
-      std::cout<<tc_line<<std::endl;
-
-      if(firstline){ // event's TC vector is empty, do nothing
-
-        firstline=false;
-
-      } else { // store previous event's TC vector
-
-        TCs_out.push_back(TCs_tmp);
-        TCs_tmp.clear();
+	}
 
       }
+      std::cout << std::endl;
     }
+
+    std::cout << std::endl;
+    evt++;
+    TCs_out.push_back(TCs_tmp);
+    TCs_tmp.clear();
+
   }
 
-  // store last event's TC vector
-  TCs_out.push_back(TCs_tmp);
-  TCs_tmp.clear();
-
   return TCs_out;
+
 }
 
-std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > SAConfigParser::getTCmap(const std::string theTCMap) const {
+std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > SAConfigParser::getTCmap(const std::string& theTCMap) const {
 /*
   TCmap reader from LLR S1 firmware generator configuration
 */
   std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > TCmap_out;
   std::ifstream TCMap(theTCMap);
-  std::cout<<theTCMap<<std::endl;
   if (!TCMap.is_open()) throw std::runtime_error("Could not open TC map.");
+  std::cout<<theTCMap<<std::endl;
+
   std::string tc, colname;
   std::string tcline;
   double val;
@@ -196,7 +172,7 @@ std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > SAConfigParse
   return TCmap_out;
 }
 
-Stage1TruncationConfig SAConfigParser::parseCfg(const std::string theCfgFile) const {
+Stage1TruncationConfig SAConfigParser::parseCfg(const std::string& theCfgFile) const {
   /*
     Parser for Stage 1 configuration
     Currently handling a fixed set of parameters:
@@ -209,58 +185,57 @@ Stage1TruncationConfig SAConfigParser::parseCfg(const std::string theCfgFile) co
   */
 
   // Read json file into string
-  std::ifstream ifs(theCfgFile);
-  std::string jsonContent( (std::istreambuf_iterator<char>(ifs) ),
-			   (std::istreambuf_iterator<char>()    ) );
+  std::ifstream theJSONCfg(theCfgFile);
+  if (!theJSONCfg.is_open()) throw std::runtime_error("Could not open config file.");
 
   // Parse string into rapidjson Document
-  rapidjson::Document theCfg;
-  if (theCfg.Parse(jsonContent.c_str()).HasParseError()) {
-    throw std::runtime_error("Could not parse json config.");
+  json theCfg;
+  theJSONCfg >> theCfg;
+
+  // - doTruncation (bool)
+  bool doTruncation = false;
+  try {
+    doTruncation = theCfg.at("doTruncation");
+  } catch (const json::exception& e) {
+    throw std::runtime_error("Could not read required parameter: doTruncation");
   }
 
-  // Access values in theCfg 
-  assert(theCfg.IsObject());
-  
-  // - doTruncation (bool)
-  assert(theCfg.HasMember("doTruncation"));
-  assert(theCfg["doTruncation"].IsBool());
-  bool doTruncation = theCfg["doTruncation"].GetBool();
-  std::cout << "doTruncation="<<doTruncation<<std::endl;
-  
-  // - rozMin/rozMax (double)
-  assert(theCfg.HasMember("rozMin"));
-  assert(theCfg["rozMin"].IsDouble());
-  double rozMin = theCfg["rozMin"].GetDouble();
-  std::cout << "rozMin="<<rozMin<<std::endl;
-  
 
-  assert(theCfg.HasMember("rozMax"));
-  assert(theCfg["rozMax"].IsDouble());
-  double rozMax = theCfg["rozMax"].GetDouble();
-  std::cout << "rozMax="<<rozMax<<std::endl;
+  // - rozMin/rozMax (double)
+  double rozMin = 0.;
+  double rozMax = 0.;
+  try {
+    rozMin = theCfg.at("rozMin");
+    rozMax = theCfg.at("rozMax");
+  } catch (const json::exception& e) {
+    throw std::runtime_error("Could not read required parameter: rozMin,rozMax");
+  }
 
   // - rozBins (unsigned)
-  assert(theCfg.HasMember("rozBins"));
-  assert(theCfg["rozBins"].IsInt());
-  unsigned rozBins = theCfg["rozBins"].GetInt();
-  std::cout << "rozBins="<<rozBins<<std::endl;
+  unsigned rozBins = 0;
+  try {
+    rozBins = theCfg.at("rozBins");
+  } catch (const json::exception& e) {
+    throw std::runtime_error("Could not read required parameter: rozBins");
+  }
 
   // - maxTCsPerBin (vector<unsigned>) from an array
-  assert(theCfg.HasMember("maxTCsPerBin"));
-  const rapidjson::Value& theArray = theCfg["maxTCsPerBin"];
-  assert(theArray.IsArray());
   std::vector<unsigned> maxTCsPerBin;
-  for (rapidjson::Value::ConstValueIterator itr = theArray.Begin(); itr != theArray.End(); ++itr)
-    maxTCsPerBin.push_back(itr->GetInt());
-    
+  try {
+    for (const unsigned& theBinMaxTCs: theCfg.at("maxTCsPerBin"))
+      maxTCsPerBin.push_back(theBinMaxTCs);
+  } catch (const json::exception& e) {
+    throw std::runtime_error("Could not read required parameter: maxTCsPerBin");
+  }
+
   // - phiSectorEdges (vector<double>) from an array
-  assert(theCfg.HasMember("phiSectorEdges"));
-  const rapidjson::Value& theEdgesArray = theCfg["phiSectorEdges"];
-  assert(theEdgesArray.IsArray());
   std::vector<double> phiSectorEdges;
-  for (rapidjson::Value::ConstValueIterator itr = theEdgesArray.Begin(); itr != theEdgesArray.End(); ++itr)
-    phiSectorEdges.push_back(itr->GetDouble());
+  try {
+    for (const double& theEdge: theCfg.at("phiSectorEdges"))
+      phiSectorEdges.push_back(theEdge);
+  } catch (const json::exception& e) {
+    throw std::runtime_error("Could not read required parameter: phiSectorEdge");
+  }
 
   // Fill in CMSSW-format config
   Stage1TruncationConfig theConfig(doTruncation, rozMin, rozMax, rozBins, maxTCsPerBin, phiSectorEdges);

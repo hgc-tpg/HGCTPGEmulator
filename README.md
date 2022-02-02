@@ -4,13 +4,24 @@
 
 Ensemble of python and C++ modules to run the HGC-TPG backend firmware emulator.
 
+## Dependencies
+
+The testing framework uses the `nlohmann_json` library, which must be installed and accessible. If not, it can be easily set, e.g. in a conda environment:
+
+```
+conda create --name newEnv
+conda activate newEnv
+conda install -c conda-forge nlohmann_json pkg-config
+```
+
+`pkg-config` is also needed inside the conda environment, in order to automatically pick up the package location inside the Makefile.
+
+
 ## Stage1 emulator
 
 Temporary input and config files are available at the following link:
 
 https://cernbox.cern.ch/index.php/s/mLpzkHbba8dXgDD
-
-
 
 The stage 1 emulator can be tested with two different formats of inputs, as provided here:
 

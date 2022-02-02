@@ -4,9 +4,8 @@
 #include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalStage1TruncationConfig_SA.h"
 #include "L1Trigger/L1THGCal/interface/backend_emulator/HGCalTriggerCell_SA.h"
 
-#include "HGCTPGEmulator/interface/rapidjson/document.h"
-#include "HGCTPGEmulator/interface/rapidjson/prettywriter.h"
-
+#include <nlohmann/json.hpp>
+using json = nlohmann::json;
 
 #include <iostream>
 #include <fstream>
@@ -26,13 +25,13 @@ public:
   SAConfigParser();
   ~SAConfigParser() {}
 
-  std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > parseTClist(const std::string theInputFile) const;
-  std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > parseTClist(const std::string theInputFile, const std::string theTCMap) const;
+  std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > parseTClist(const std::string& theInputFile) const;
+  std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > parseTClist(const std::string& theInputFile, const std::string& theTCMap) const;
 
-  l1thgcfirmware::Stage1TruncationConfig parseCfg(const std::string theCfgFile) const;
+  l1thgcfirmware::Stage1TruncationConfig parseCfg(const std::string& theCfgFile) const;
 
 private:
-  std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > getTCmap(const std::string theTCMap) const;
+  std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > getTCmap(const std::string& theTCMap) const;
 };
 
 #endif
