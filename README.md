@@ -16,6 +16,35 @@ conda install -c conda-forge nlohmann_json pkg-config
 
 `pkg-config` is also needed inside the conda environment, in order to automatically pick up the package location inside the Makefile.
 
+## Setup and run tests
+
+# Setup
+```
+# get HGCTPGEmulator & CMSSW dependancies
+mkdir HGCTPGEmulator
+cd HGCTPGEmulator
+git init
+mv .git/ .githgctpg
+git --git-dir=.githgctpg remote add -t HGCTPGEmulator_S1 S1Emulator git@github.com:portalesHEP/HGCTPGEmulator.git
+git --git-dir=.githgctpg pull S1Emulator HGCTPGEmulator_S1
+source getCMSSWCode_S1.sh
+
+# Create conda env with required packages
+conda create --name myEnv
+conda activate newEnv
+conda install -c conda-forge nlohmann_json pkg-config
+```
+
+# run
+
+Note: The paths to input and configuration files found in `run.sh` requires access to the eos repository. If not accessible, copies of these files are available at `/afs/cern.ch/user/l/lportale/public/HGCTPG/`.
+
+```
+# Compile & run tester
+make
+cd test
+source run.sh
+```
 
 ## Stage1 emulator
 
@@ -29,7 +58,7 @@ The stage 1 emulator can be tested with two different formats of inputs, as prov
 
   These files directly contain the TC information needed to run the emulator.
 
-- `inputs/TClist.txt`: list generated from `ModXXXX_stimuli.txt` files, containing input TCs per module, as used for S1 firwmare testing. 
+- `inputs/TClist.json`: list generated from `ModXXXX_stimuli.txt` files, containing input TCs per module, as used for S1 firwmare testing. 
 
   For these, additional information on the mapping of FPGA/modules/TCs in <img src="https://render.githubusercontent.com/render/math?math=(r/z,\phi)"> is needed. These are `.csv` files, generated with `python/generateTCMap.py`.
 
