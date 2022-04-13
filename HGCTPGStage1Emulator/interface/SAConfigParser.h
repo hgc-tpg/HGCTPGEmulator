@@ -22,16 +22,26 @@ using json = nlohmann::json;
 class SAConfigParser {
 public:
 
-  SAConfigParser();
+  SAConfigParser(const std::string& inputFile);
   ~SAConfigParser() {}
 
-  std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > parseTClist(const std::string& theInputFile) const;
-  std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > parseTClist(const std::string& theInputFile, const std::string& theTCMap) const;
-
-  l1thgcfirmware::Stage1TruncationConfig parseCfg(const std::string& theCfgFile) const;
+  // getters
+  l1thgcfirmware::Stage1TruncationConfig getCfg() const {return theCfg_;}
+  std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > getTCmap() const {return theTCMap_;}
+  const double magic_number(){return rozphi_scale_;}
 
 private:
-  std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > getTCmap(const std::string& theTCMap) const;
+  l1thgcfirmware::Stage1TruncationConfig parseCfg(const std::string& theCfgFile) const;
+  std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > setTCmap(const std::string& theTCMap) const;
+
+  l1thgcfirmware::Stage1TruncationConfig theCfg_;
+  std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > theTCMap_;
+
+  double rotatedphi(double phi) const;
+
+  // magic number
+  static constexpr double rozphi_scale_ = 4096./0.7;
+
 };
 
 #endif
