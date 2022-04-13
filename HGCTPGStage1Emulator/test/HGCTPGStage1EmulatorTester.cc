@@ -182,7 +182,7 @@ int HGCTPGEmulatorTester::dumpTCs_fw(const HGCalTriggerCellsPerBx& tcPerBx,
       unsigned TCe = TC.energy();
       // saving module hash for now to keep output format consistent; this will have to be changed
       unsigned TCid = TC.index(); // index_cmssw() -> moduleHash; index() -> TC address (in module)
-      unsigned TCout = (TC.index() << offset_e_);// + TC.energy();
+      unsigned TCout = (TCid << offset_e_) + TCe;
       std::stringstream sstream;
       sstream << std::uppercase << std::hex << TCout;
       outputStream << sstream.str() << " ";
