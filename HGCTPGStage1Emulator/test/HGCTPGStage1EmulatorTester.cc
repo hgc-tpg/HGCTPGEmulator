@@ -164,7 +164,7 @@ int HGCTPGEmulatorTester::dumpTCs_fw(const HGCalTriggerCellsPerBx& tcPerBx,
   // Loop on vector per bins
   for (const auto& bin_tcs : TCandEvtperBin) {
 
-    unsigned rzbin = ((bin_tcs.first >> offset_roz_) & mask_roz_); // put offset & mask as class members instead
+    unsigned rzbin = ((bin_tcs.first >> offset_roz_) & mask_roz_);
     unsigned phibin = (bin_tcs.first & mask_phi_);
 
     std::ofstream outputStream;
@@ -180,8 +180,9 @@ int HGCTPGEmulatorTester::dumpTCs_fw(const HGCalTriggerCellsPerBx& tcPerBx,
       HGCalTriggerCell TC = evtAndTc.second;
 
       unsigned TCe = TC.energy();
+
       // saving module hash for now to keep output format consistent; this will have to be changed
-      unsigned TCid = TC.index(); // index_cmssw() -> moduleHash; index() -> TC address (in module)
+      unsigned TCid = (TC.index() << 6) + TC.index_cmssw(); // index_cmssw() -> TC address (in module); index() -> module hash
       unsigned TCout = (TCid << offset_e_) + TCe;
       std::stringstream sstream;
       sstream << std::uppercase << std::hex << TCout;
