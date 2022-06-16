@@ -80,6 +80,7 @@ std::vector< std::vector <HGCalTriggerCell> > SATCParser::parseTClist(const std:
     std::cout << "Event " << evt << ":" << std::endl;
 
     // loop on modules
+    unsigned moduleId = 0;
     for (json::iterator moduleIt = event.at("module").begin(); moduleIt != event.at("module").end(); ++moduleIt) {
 
       // store module hash
@@ -108,7 +109,8 @@ std::vector< std::vector <HGCalTriggerCell> > SATCParser::parseTClist(const std:
 				 (unsigned)std::stoi(tc.c_str(),0,16), // energy
 				 tcid); // id_cmssw (FIXME)
 	  
-	  tmpTC.setIndex(moduleHash); // 
+	  // set "firmware-style" module ID"
+	  tmpTC.setIndex(moduleId);
 	  // fill event's TC vector
 	  TCs_tmp.push_back(tmpTC);
 
@@ -126,6 +128,7 @@ std::vector< std::vector <HGCalTriggerCell> > SATCParser::parseTClist(const std:
 
       }
       std::cout << std::endl;
+      moduleId++;
     }
 
     std::cout << std::endl;

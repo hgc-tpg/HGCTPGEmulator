@@ -180,12 +180,10 @@ int HGCTPGEmulatorTester::dumpTCs_fw(const HGCalTriggerCellsPerBx& tcPerBx,
       HGCalTriggerCell TC = evtAndTc.second;
 
       unsigned TCe = TC.energy();
-
-      // saving module hash for now to keep output format consistent; this will have to be changed
       unsigned TCid = (TC.index() << 6) + TC.index_cmssw(); // index_cmssw() -> TC address (in module); index() -> module hash
       unsigned TCout = (TCid << offset_e_) + TCe;
       std::stringstream sstream;
-      sstream << std::uppercase << std::hex << TCout;
+      sstream << std::uppercase << std::hex << std::setw(6) << std::setfill('0') << TCout;
       outputStream << sstream.str() << " ";
     }
     outputStream.close();
@@ -227,7 +225,7 @@ int main(int argc, char **argv) {
   error_code = hgctpgTester.dumpTCs_fw(hgctpgTester.getTCs(), unsortedTCdumpFile_fw);
 
   std::cout << "    2. sorted and truncated - fw comparison format" << std::endl;
-  const std::string sortedTCdumpFile_fw = dumpDir+"/sortedTruncatedTCs";
+  const std::string sortedTCdumpFile_fw = dumpDir+"/Results";
   error_code = hgctpgTester.dumpTCs_fw(sortedTruncatedTCsPerBx, sortedTCdumpFile_fw);
   
   std::cout << "Exiting." << std::endl;
