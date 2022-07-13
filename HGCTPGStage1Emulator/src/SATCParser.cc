@@ -105,7 +105,7 @@ std::vector< std::vector <HGCalTriggerCell> > SATCParser::parseTClist(const std:
 				 true, // not important for S1?
 				 std::get<0>(roz_phi->second), // roverz (w/ magic numbers)
 				 std::get<1>(roz_phi->second), // phi (w/ magic numbers)
-				 50, // layer - dummy for now, to correct (although not used for S1)
+				 50, // dummy layer (although not used for S1)
 				 (unsigned)std::stoi(tc.c_str(),0,16), // energy
 				 tcid); // id_cmssw (FIXME)
 	  

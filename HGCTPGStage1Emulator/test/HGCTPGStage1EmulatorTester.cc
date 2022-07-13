@@ -147,10 +147,10 @@ int HGCTPGEmulatorTester::dumpTCs_fw(const HGCalTriggerCellsPerBx& tcPerBx,
       double rz = tc.rOverZ();
       rz = (rz < rzmin_ ? rzmin_ : rz);
       rz = (rz > rzmax_ ? rzmax_ : rz);
-      unsigned rzbin = (rz_bin_size_ > 0. ? unsigned((rz - rzmin_) / rz_bin_size_) : 0);
+      unsigned rzbin = tc.rOverZ();//(rz_bin_size_ > 0. ? unsigned((rz - rzmin_) / rz_bin_size_) : 0);
       
       double phi = tc.phi();
-      unsigned phibin = (phi > stage1Config_.phiEdges().at(rzbin));
+      unsigned phibin = tc.phi();//(phi > stage1Config_.phiEdges().at(rzbin));
 
       unsigned packed_bin = 0;
       packed_bin |= ((rzbin & mask_roz_) << offset_roz_);

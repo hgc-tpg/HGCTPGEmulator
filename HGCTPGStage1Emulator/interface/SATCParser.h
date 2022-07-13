@@ -20,7 +20,7 @@ using json = nlohmann::json;
 #include <utility> // std::pair
 #include <stdexcept> // std::runtime_error
 
-typedef std::map< std::pair<unsigned,unsigned>, std::pair<double,double> > TCMap;
+typedef std::map< std::pair<unsigned,unsigned>, std::pair<unsigned,unsigned> > TCMap;
 
 class SATCParser {
 
@@ -31,17 +31,15 @@ public:
 
 
   std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > TClist() const {return theTClist_;}
-  const double magic_number(){return rozphi_scale_;}
+  const double rozPhiScale(){return rozphi_scale_;}
+
+  static constexpr double rozphi_scale_ = 4096./0.7;
 
 private:
   std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > parseTClist_s2(const std::string& theInputFile) const;
   std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > parseTClist(const std::string& theInputFile, const TCMap& theTCMap) const;
 
   const std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > theTClist_;
-  //TCMap theTCMap_;
-
-  // magic number
-  static constexpr double rozphi_scale_ = 4096./0.7;
 
 };
 
