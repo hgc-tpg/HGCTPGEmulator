@@ -24,7 +24,7 @@ public:
   
   int runAlgo(const HGCalTriggerCellsPerBx&, HGCalTriggerCellsPerBx&);
   int dumpTCs(const HGCalTriggerCellsPerBx&, const std::string);
-  int dumpTCs_fw(const HGCalTriggerCellsPerBx&, const std::string);
+  int dumpTCs_fw(const HGCalTriggerCellsPerBx&, const std::string, const bool);
 
   //getter
   HGCalTriggerCellsPerBx getTCs() {return allTCs_;}
@@ -117,7 +117,8 @@ int HGCTPGEmulatorTester::dumpTCs(const HGCalTriggerCellsPerBx& tcPerBx,
 }
 
 int HGCTPGEmulatorTester::dumpTCs_fw(const HGCalTriggerCellsPerBx& tcPerBx,
-				     const std::string outputFileName) {  
+				     const std::string outputFileName,
+				     const bool dumpAddresses) {  
 
   /* 
 
@@ -181,9 +182,12 @@ int HGCTPGEmulatorTester::dumpTCs_fw(const HGCalTriggerCellsPerBx& tcPerBx,
 
       unsigned TCe = TC.energy();
       unsigned TCid = (TC.index() << 6) + TC.index_cmssw(); // index_cmssw() -> TC address (in module); index() -> module hash
-      unsigned TCout = (TCid << offset_e_) + TCe;
+      unsigned TCout = (dumpAddresses) ? (TCid << offset_e_) + TCe : TCe;
       std::stringstream sstream;
-      sstream << std::uppercase << std::hex << std::setw(6) << std::setfill('0') << TCout;
+      if(dumpAddresses)
+	sstream << std::uppercase << std::hex << std::setw(6) << std::setfill('0') << TCout;
+      else
+	sstream << "    " << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << TCout;
       outputStream << sstream.str() << " ";
     }
     outputStream.close();
@@ -222,11 +226,11 @@ int main(int argc, char **argv) {
   // Hex tables (TC address/energies)
   std::cout << "    1. before sorting and truncation - fw comparison format" << std::endl;
   const std::string unsortedTCdumpFile_fw = dumpDir+"/inputTCs";
-  error_code = hgctpgTester.dumpTCs_fw(hgctpgTester.getTCs(), unsortedTCdumpFile_fw);
+  error_code = hgctpgTester.dumpTCs_fw(hgctpgTester.getTCs(), unsortedTCdumpFile_fw, false);
 
   std::cout << "    2. sorted and truncated - fw comparison format" << std::endl;
   const std::string sortedTCdumpFile_fw = dumpDir+"/Results";
-  error_code = hgctpgTester.dumpTCs_fw(sortedTruncatedTCsPerBx, sortedTCdumpFile_fw);
+  error_code = hgctpgTester.dumpTCs_fw(sortedTruncatedTCsPerBx, sortedTCdumpFile_fw, true);
   
   std::cout << "Exiting." << std::endl;
   
