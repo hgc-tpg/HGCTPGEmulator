@@ -225,8 +225,8 @@ int main(int argc, char **argv) {
   
   // Hex tables (TC address/energies)
   std::cout << "    1. before sorting and truncation - fw comparison format" << std::endl;
-  const std::string unsortedTCdumpFile_fw = dumpDir+"/inputTCs";
-  error_code = hgctpgTester.dumpTCs_fw(hgctpgTester.getTCs(), unsortedTCdumpFile_fw, false);
+  const std::string unsortedTCdumpFile_fw = dumpDir+"/Inputs";
+  error_code = hgctpgTester.dumpTCs_fw(hgctpgTester.getTCs(), unsortedTCdumpFile_fw, true);
 
   std::cout << "    2. sorted and truncated - fw comparison format" << std::endl;
   const std::string sortedTCdumpFile_fw = dumpDir+"/Results";
