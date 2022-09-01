@@ -187,7 +187,7 @@ int HGCTPGEmulatorTester::dumpTCs_fw(const HGCalTriggerCellsPerBx& tcPerBx,
       if(dumpAddresses)
 	sstream << std::uppercase << std::hex << std::setw(6) << std::setfill('0') << TCout;
       else
-	sstream << "    " << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << TCout;
+	sstream << TC.index() << std::uppercase << std::hex << std::setw(2) << std::setfill('0') << TCout;
       outputStream << sstream.str() << " ";
     }
     outputStream.close();
