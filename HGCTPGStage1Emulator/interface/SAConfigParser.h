@@ -28,7 +28,6 @@ public:
   // getters
   const l1thgcfirmware::Stage1TruncationConfig& getCfg() const {return theCfg_;}
   const std::map< std::pair<unsigned,unsigned>, std::pair<unsigned,unsigned> >& getTCmap() const {return theTCMap_;}
-  const double& magic_number(){return rozphi_scale_;}
 
 private:
   int parseCfg(const std::string& theCfgFile, l1thgcfirmware::Stage1TruncationConfig& theConfig) const;
@@ -39,9 +38,6 @@ private:
   std::map< std::pair<unsigned,unsigned>, std::pair<unsigned,unsigned> > theTCMap_;
 
   double rotatedphi(double phi) const;
-
-  // magic number
-  static constexpr double rozphi_scale_ = 4096./0.7;
 
 };
 

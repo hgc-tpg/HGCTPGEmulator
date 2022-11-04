@@ -73,20 +73,13 @@ int SAConfigParser::parseCfg(const std::string& theCfgFile, Stage1TruncationConf
 
   // - doTruncation (bool)
   bool doTruncation = true;
-  /*
-  try {
-    doTruncation = theCfg.at("doTruncation");
-  } catch (const json::exception& e) {
-    throw std::runtime_error("Could not read required parameter: doTruncation");
-  }
-  */
 
   // - rozMin/rozMax (double)
   double rozMin = 0.;
   double rozMax = 0.;
   try {
-    rozMin = (double)theCfg.at("rozMin") * rozphi_scale_;
-    rozMax = (double)theCfg.at("rozMax") * rozphi_scale_;
+    rozMin = (double)theCfg.at("rozMin");
+    rozMax = (double)theCfg.at("rozMax");
   } catch (const json::exception& e) {
     throw std::runtime_error("Could not read required parameter: rozMin,rozMax");
   }
@@ -112,7 +105,7 @@ int SAConfigParser::parseCfg(const std::string& theCfgFile, Stage1TruncationConf
   std::vector<double> phiSectorEdges;
   try {
     for (const double& theEdge: theCfg.at("phiSectorEdges"))
-      phiSectorEdges.push_back(theEdge * rozphi_scale_);
+      phiSectorEdges.push_back(theEdge);
   } catch (const json::exception& e) {
     throw std::runtime_error("Could not read required parameter: phiSectorEdge");
   }
