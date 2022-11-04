@@ -26,9 +26,9 @@ public:
   ~SAConfigParser() {}
 
   // getters
-  l1thgcfirmware::Stage1TruncationConfig getCfg() const {return theCfg_;}
-  std::map< std::pair<unsigned,unsigned>, std::pair<unsigned,unsigned> > getTCmap() const {return theTCMap_;}
-  const double magic_number(){return rozphi_scale_;}
+  const l1thgcfirmware::Stage1TruncationConfig& getCfg() const {return theCfg_;}
+  const std::map< std::pair<unsigned,unsigned>, std::pair<unsigned,unsigned> >& getTCmap() const {return theTCMap_;}
+  const double& magic_number(){return rozphi_scale_;}
 
 private:
   l1thgcfirmware::Stage1TruncationConfig parseCfg(const std::string& theCfgFile) const;

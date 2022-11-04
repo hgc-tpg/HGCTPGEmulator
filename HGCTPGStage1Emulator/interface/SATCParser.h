@@ -30,7 +30,7 @@ public:
   ~SATCParser() {}
 
 
-  std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > TClist() const {return theTClist_;}
+  const std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> >& TClist() const {return theTClist_;}
 
 private:
   std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > parseTClist_s2(const std::string& theInputFile) const;
