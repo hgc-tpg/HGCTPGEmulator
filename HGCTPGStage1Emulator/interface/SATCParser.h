@@ -34,9 +34,9 @@ public:
 
 private:
   std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > parseTClist_s2(const std::string& theInputFile) const;
-  std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > parseTClist(const std::string& theInputFile, const TCMap& theTCMap) const;
+  int parseTClist(const std::string& theInputFile, const TCMap& theTCMap, std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> >& TCs_out) const;
 
-  const std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > theTClist_;
+  std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > theTClist_;
 
 };
 

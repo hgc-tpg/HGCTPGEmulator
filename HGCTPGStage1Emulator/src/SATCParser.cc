@@ -2,9 +2,9 @@
 
 using namespace l1thgcfirmware;
 
-SATCParser::SATCParser(const std::string& tcFile, const TCMap& theTCMap) :
-  theTClist_(parseTClist(tcFile, theTCMap))
-{}
+SATCParser::SATCParser(const std::string& tcFile, const TCMap& theTCMap) {
+  parseTClist(tcFile, theTCMap, theTClist_);
+}
 
 std::vector< std::vector <HGCalTriggerCell> > SATCParser::parseTClist_s2(const std::string& theInputFile) const {
   /*
@@ -56,14 +56,14 @@ std::vector< std::vector <HGCalTriggerCell> > SATCParser::parseTClist_s2(const s
   return TCs_out;
 }
 
-std::vector< std::vector <HGCalTriggerCell> > SATCParser::parseTClist(const std::string& theInputFile, const TCMap& theTCMap) const {
+int SATCParser::parseTClist(const std::string& theInputFile, const TCMap& theTCMap, std::vector< std::vector <HGCalTriggerCell> >& TCs_out) const {
   /*
     TC reader for input format defined for Stage 1 tests
   */
 
   std::cout<<"---- parsing tc list"<<std::endl;
 
-  std::vector< std::vector <HGCalTriggerCell> > TCs_out;
+  //std::vector< std::vector <HGCalTriggerCell> > TCs_out;
   std::vector <HGCalTriggerCell> TCs_tmp;
 
 
@@ -138,6 +138,5 @@ std::vector< std::vector <HGCalTriggerCell> > SATCParser::parseTClist(const std:
 
   }
 
-  return TCs_out;
-
+  return 1;
 }
