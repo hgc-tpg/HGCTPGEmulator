@@ -2,8 +2,10 @@
 
 using namespace l1thgcfirmware;
 
-SAConfigParser::SAConfigParser(const std::string& inputFile) :
-  theCfg_(parseCfg(inputFile)) { setTCmap(inputFile, theTCMap_); }
+SAConfigParser::SAConfigParser(const std::string& inputFile){
+  parseCfg(inputFile, theCfg_);
+  setTCmap(inputFile, theTCMap_);
+}
 
 int SAConfigParser::setTCmap(const std::string& theTCMap, 
 			     std::map< std::pair<unsigned,unsigned>, std::pair<unsigned,unsigned> >& TCmap_out) const {
@@ -37,7 +39,7 @@ int SAConfigParser::setTCmap(const std::string& theTCMap,
   return 1;
 }
 
-Stage1TruncationConfig SAConfigParser::parseCfg(const std::string& theCfgFile) const {
+int SAConfigParser::parseCfg(const std::string& theCfgFile, Stage1TruncationConfig& theConfig) const {
   /*
     Parser for Stage 1 configuration
     Currently handling a fixed set of parameters:
@@ -59,7 +61,6 @@ Stage1TruncationConfig SAConfigParser::parseCfg(const std::string& theCfgFile) c
   
   json theCfg = theCfgJSON["TruncationConfig"];
 
-  
   // - doTruncation (bool)
   bool doTruncation = true;
   /*
@@ -107,8 +108,9 @@ Stage1TruncationConfig SAConfigParser::parseCfg(const std::string& theCfgFile) c
   }
 
   // Fill in CMSSW-format config
-  Stage1TruncationConfig theConfig(doTruncation, rozMin, rozMax, rozBins, maxTCsPerBin, phiSectorEdges);
-  return theConfig;
+  theConfig.setParameters(doTruncation, rozMin, rozMax, rozBins, maxTCsPerBin, phiSectorEdges);
+
+  return 1;
 
 }
 

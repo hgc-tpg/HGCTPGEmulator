@@ -31,7 +31,7 @@ public:
   const double& magic_number(){return rozphi_scale_;}
 
 private:
-  l1thgcfirmware::Stage1TruncationConfig parseCfg(const std::string& theCfgFile) const;
+  int parseCfg(const std::string& theCfgFile, l1thgcfirmware::Stage1TruncationConfig& theConfig) const;
   int setTCmap(const std::string& theTCMapName, 
 	       std::map< std::pair<unsigned,unsigned>, std::pair<unsigned,unsigned> >& TCmap_out) const;
 
