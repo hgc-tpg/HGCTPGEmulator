@@ -3,10 +3,10 @@
 using namespace l1thgcfirmware;
 
 SAConfigParser::SAConfigParser(const std::string& inputFile) :
-  theCfg_(parseCfg(inputFile)),
-  theTCMap_(setTCmap(inputFile)) {}
+  theCfg_(parseCfg(inputFile)) { setTCmap(inputFile, theTCMap_); }
 
-std::map< std::pair<unsigned,unsigned>, std::pair<unsigned,unsigned> > SAConfigParser::setTCmap(const std::string& theTCMap) const {
+int SAConfigParser::setTCmap(const std::string& theTCMap, 
+			     std::map< std::pair<unsigned,unsigned>, std::pair<unsigned,unsigned> >& TCmap_out) const {
 /*
   TCmap reader from LLR S1 firmware generator configuration
 */
@@ -20,23 +20,21 @@ std::map< std::pair<unsigned,unsigned>, std::pair<unsigned,unsigned> > SAConfigP
   json theCfgJSON = theJSON["TriggerCellMap"];
 
   // loop on events
-  std::map< std::pair<unsigned,unsigned>, std::pair<unsigned,unsigned> > TCmap_out;
   for (auto& module: theCfgJSON["Module"]) {
 
     unsigned moduleHash = std::stoul((std::string)module.at("hash"));
     
     for (auto &tc: module["tcs"]) {
 
-      double tcRoz = (unsigned)tc["roz_bin"];//rozphi_scale_ * (double)tc["roz"];
-      double tcPhi = (unsigned)tc["phi_bin"];//rozphi_scale_ * rotatedphi((double)tc["phi"]);
-      //double tcPhi = rozphi_scale_ * (double)tc["phi"];
+      unsigned tcRoz = (unsigned)tc["roz_bin"];
+      unsigned tcPhi = (unsigned)tc["phi_bin"];
 
       TCmap_out.insert({std::pair<unsigned,unsigned>(moduleHash, tc["tcid"]),
 	                std::pair<unsigned,unsigned>(tcRoz, tcPhi)});
     }
   }
 
-  return TCmap_out;
+  return 1;
 }
 
 Stage1TruncationConfig SAConfigParser::parseCfg(const std::string& theCfgFile) const {

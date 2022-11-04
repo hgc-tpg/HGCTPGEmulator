@@ -31,9 +31,6 @@ public:
 
 
   std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > TClist() const {return theTClist_;}
-  const double rozPhiScale(){return rozphi_scale_;}
-
-  static constexpr double rozphi_scale_ = 4096./0.7;
 
 private:
   std::vector< std::vector <l1thgcfirmware::HGCalTriggerCell> > parseTClist_s2(const std::string& theInputFile) const;

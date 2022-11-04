@@ -43,7 +43,7 @@ private:
   double rz_bin_size_;
   static constexpr double margin_ = 1.001;
 
-  TCMap theTCMap_;
+  //TCMap theTCMap_;
   HGCalStage1TruncationImplSA stage1Algo_;
 
   HGCalTriggerCellsPerBx allTCs_;
@@ -69,10 +69,8 @@ HGCTPGEmulatorTester::HGCTPGEmulatorTester(const std::string jsonConfigFile,
   rzmax_ = stage1Config_.rozMax();
   rz_bin_size_ = (rzmax_ - rzmin_) * margin_ / stage1Config_.rozBins();
 
-  theTCMap_ = cfgReader.getTCmap();
-
   std::cout << "-- Initializing TC reader" << std::endl;
-  SATCParser tcReader(tcList, theTCMap_);
+  SATCParser tcReader(tcList, cfgReader.getTCmap());
   std::cout << "-- Getting TC list" << std::endl;
   allTCs_ = tcReader.TClist();
 
