@@ -3,8 +3,18 @@
 using namespace l1thgcfirmware;
 
 SAConfigParser::SAConfigParser(const std::string& inputFile){
-  parseCfg(inputFile, theCfg_);
-  setTCmap(inputFile, theTCMap_);
+  try {
+    parseCfg(inputFile, theCfg_);
+  } catch (const std::runtime_error e){
+    std::cerr << e.what();
+    std::abort();
+  }
+  try {
+    setTCmap(inputFile, theTCMap_);
+  } catch (const std::runtime_error e){
+    std::cerr << e.what();
+    std::abort();
+  }
 }
 
 int SAConfigParser::setTCmap(const std::string& theTCMap, 
