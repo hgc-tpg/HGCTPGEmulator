@@ -116,17 +116,3 @@ int SAConfigParser::parseCfg(const std::string& theCfgFile, Stage1TruncationConf
   return 1;
 
 }
-
-double SAConfigParser::rotatedphi(double phi) const {
-
-  if (phi > 2.*M_PI / 3. and phi < 4.* M_PI / 3.)
-    phi = phi - (2. * M_PI / 3.);
-  else if (phi < -2.*M_PI / 3. and phi > -4.* M_PI / 3.)
-    phi = 2.*M_PI - phi - (2. * M_PI / 3.);
-  else if (phi > -2.*M_PI / 3. and phi < 0)
-    phi = 2.*M_PI - phi + (2. * M_PI / 3.);
-  else if (phi > 4. * M_PI / 3. and phi < 2 * M_PI)
-    phi = phi - (4. * M_PI / 3.);
-
-  return phi;
-}

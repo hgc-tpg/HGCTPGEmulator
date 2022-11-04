@@ -37,8 +37,6 @@ private:
   l1thgcfirmware::Stage1TruncationConfig theCfg_;
   std::map< std::pair<unsigned,unsigned>, std::pair<unsigned,unsigned> > theTCMap_;
 
-  double rotatedphi(double phi) const;
-
 };
 
 #endif
