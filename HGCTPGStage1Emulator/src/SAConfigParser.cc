@@ -32,11 +32,11 @@ int SAConfigParser::setTCmap(const std::string& theTCMap,
   json theCfgJSON = theJSON["TriggerCellMap"];
 
   // loop on events
-  for (auto& module: theCfgJSON["Module"]) {
+  for (const auto& module: theCfgJSON["Module"]) {
 
     unsigned moduleHash = std::stoul((std::string)module.at("hash"));
     
-    for (auto &tc: module["tcs"]) {
+    for (const auto& tc: module["tcs"]) {
 
       unsigned tcRoz = (unsigned)tc["roz_bin"];
       unsigned tcPhi = (unsigned)tc["phi_bin"];
