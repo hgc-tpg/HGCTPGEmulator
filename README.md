@@ -4,17 +4,6 @@
 
 Ensemble of python and C++ modules to run the HGC-TPG backend firmware emulator.
 
-## Dependencies
-
-The testing framework uses the `nlohmann_json` library, which must be installed and accessible. If not, it can be easily set, e.g. in a conda environment:
-
-```
-conda create --name newEnv
-conda activate newEnv
-conda install -c conda-forge nlohmann_json pkg-config
-```
-
-`pkg-config` is also needed inside the conda environment, in order to automatically pick up the package location inside the Makefile.
 
 ## Setup and run tests
 
@@ -29,10 +18,6 @@ git --git-dir=.githgctpg remote add -t HGCTPGEmulator_S1 S1Emulator git@github.c
 git --git-dir=.githgctpg pull S1Emulator HGCTPGEmulator_S1
 source getCMSSWCode_S1.sh
 
-# Create conda env with required packages
-conda create --name myEnv
-conda activate newEnv
-conda install -c conda-forge nlohmann_json pkg-config
 ```
 
 # run
