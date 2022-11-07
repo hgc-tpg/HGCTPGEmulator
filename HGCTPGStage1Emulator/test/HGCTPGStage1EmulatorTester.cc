@@ -141,7 +141,7 @@ int HGCTPGEmulatorTester::dumpTCs_fw(const HGCalTriggerCellsPerBx& tcPerBx,
   // Create TC vectors per (roz,phi) bin
   unsigned event=0;
   std::unordered_map< unsigned, std::vector<std::pair<unsigned, HGCalTriggerCell> > > TCandEvtperBin;
-  for (const auto TCs: tcPerBx) {
+  for (const auto& TCs: tcPerBx) {
     for (const auto& tc: TCs) { 
       double rz = tc.rOverZ();
       rz = (rz < rzmin_ ? rzmin_ : rz);
