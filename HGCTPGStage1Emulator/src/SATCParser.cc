@@ -3,7 +3,12 @@
 using namespace l1thgcfirmware;
 
 SATCParser::SATCParser(const std::string& tcFile, const TCMap& theTCMap) {
-  parseTClist(tcFile, theTCMap, theTClist_);
+  try {
+    parseTClist(tcFile, theTCMap, theTClist_);
+  } catch (const std::runtime_error e){
+    std::cerr << e.what();
+    std::abort();
+  }
 }
 
 std::vector< std::vector <HGCalTriggerCell> > SATCParser::parseTClist_s2(const std::string& theInputFile) const {
@@ -74,7 +79,7 @@ int SATCParser::parseTClist(const std::string& theInputFile, const TCMap& theTCM
   theFile >> theTCjson;
   int evt=0;
   // loop on events
-  for (auto& event: theTCjson.at("event")) {
+  for (auto& event: theTCjson.at("event")) { // const qualifier creates compilation issues linked to nlohmann_json. Leaving as is.
 
     std::cout << "Event " << evt << ":" << std::endl;
 
