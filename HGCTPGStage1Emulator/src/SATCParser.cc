@@ -63,7 +63,6 @@ int SATCParser::parseTClist(const std::string& theInputFile, const TCMap& theTCM
 
   std::cout<<"---- parsing tc list"<<std::endl;
 
-  //std::vector< std::vector <HGCalTriggerCell> > TCs_out;
   std::vector <HGCalTriggerCell> TCs_tmp;
 
 
@@ -96,7 +95,7 @@ int SATCParser::parseTClist(const std::string& theInputFile, const TCMap& theTCM
 	// get rz/phi values from map
 	std::pair<unsigned,unsigned> modHash_tcid{moduleHash,tcid};
 	auto roz_phi= theTCMap.find(modHash_tcid);
-	
+
 
 	// fill TC object
 	if (roz_phi!=theTCMap.end()) { // check if mapping entry exists
@@ -112,7 +111,7 @@ int SATCParser::parseTClist(const std::string& theInputFile, const TCMap& theTCM
 	  // set "firmware-style" module ID"
 	  tmpTC.setIndex(moduleId);
 	  // fill event's TC vector
-	  TCs_tmp.push_back(tmpTC);
+	  TCs_tmp.emplace_back(tmpTC);
 
 	  // printout for zero energy cell
 	  if(0==(unsigned)std::stoi(tc.c_str(),0,16)) {std::cout << "--|";}
