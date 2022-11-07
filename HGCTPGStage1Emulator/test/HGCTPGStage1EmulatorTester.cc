@@ -19,7 +19,7 @@ class HGCTPGEmulatorTester {
 
 public:
 
-  HGCTPGEmulatorTester(const std::string, const std::string);
+  HGCTPGEmulatorTester(const std::string&, const std::string&);
   ~HGCTPGEmulatorTester(){};
   
   int runAlgo(const HGCalTriggerCellsPerBx&, HGCalTriggerCellsPerBx&);
@@ -27,7 +27,7 @@ public:
   int dumpTCs_fw(const HGCalTriggerCellsPerBx&, const std::string, const bool);
 
   //getter
-  HGCalTriggerCellsPerBx getTCs() {return allTCs_;}
+  const HGCalTriggerCellsPerBx getTCs() {return allTCs_;}
 
 private:
   // dummy initialization of configuration; overwritten later
@@ -56,8 +56,8 @@ private:
   
 };
 
-HGCTPGEmulatorTester::HGCTPGEmulatorTester(const std::string jsonConfigFile, 
-					   const std::string tcList)
+HGCTPGEmulatorTester::HGCTPGEmulatorTester(const std::string& jsonConfigFile, 
+					   const std::string& tcList)
 {
   
   
@@ -79,11 +79,11 @@ HGCTPGEmulatorTester::HGCTPGEmulatorTester(const std::string jsonConfigFile,
 int HGCTPGEmulatorTester::runAlgo(const HGCalTriggerCellsPerBx& tcPerBx, HGCalTriggerCellsPerBx& sortedTruncatedTCsPerBx) {
   
   unsigned int counter = 0;
-  for (const auto TCs : tcPerBx) {
+  for (const auto& TCs : tcPerBx) {
     // Run the algorithm
     HGCalTriggerCells sortedTruncatedTCs;
     unsigned error_code = stage1Algo_.run(TCs, stage1Config_, sortedTruncatedTCs);
-    sortedTruncatedTCsPerBx.push_back(sortedTruncatedTCs);
+    sortedTruncatedTCsPerBx.emplace_back(sortedTruncatedTCs);
   }
   return 0;
 }
@@ -94,7 +94,7 @@ int HGCTPGEmulatorTester::dumpTCs(const HGCalTriggerCellsPerBx& tcPerBx,
   std::ofstream outputStream;
   outputStream.open(outputFileName);
   unsigned int counter = 0;
-  for (const auto TCs: tcPerBx) {
+  for (const auto& TCs: tcPerBx) {
     outputStream << "Event " << counter << std::endl;
     for (const auto& tc : TCs ) {
 
@@ -155,7 +155,7 @@ int HGCTPGEmulatorTester::dumpTCs_fw(const HGCalTriggerCellsPerBx& tcPerBx,
       packed_bin |= ((rzbin & mask_roz_) << offset_roz_);
       packed_bin |= (phibin & mask_phi_);
       
-      TCandEvtperBin[packed_bin].push_back(std::make_pair(event,tc));
+      TCandEvtperBin[packed_bin].emplace_back(std::make_pair(event,tc));
     } 
     event++;
   }
