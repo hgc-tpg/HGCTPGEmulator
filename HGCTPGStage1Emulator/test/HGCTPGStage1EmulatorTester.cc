@@ -27,7 +27,7 @@ public:
   int dumpTCs_fw(const HGCalTriggerCellsPerBx&, const std::string, const bool);
 
   //getter
-  const HGCalTriggerCellsPerBx getTCs() {return allTCs_;}
+  const HGCalTriggerCellsPerBx& getTCs() {return allTCs_;}
 
 private:
   // dummy initialization of configuration; overwritten later
