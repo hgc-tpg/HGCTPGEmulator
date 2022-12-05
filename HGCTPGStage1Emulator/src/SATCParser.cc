@@ -50,8 +50,9 @@ std::vector< std::vector <HGCalTriggerCell> > SATCParser::parseTClist_s2(const s
                              (unsigned)std::stoi(tmpTCcontent.at(2).c_str(),0,16),
                              (unsigned)std::stoi(tmpTCcontent.at(3).c_str(),0,16),
                              (unsigned)std::stoi(tmpTCcontent.at(4).c_str(),0,16),
-                             (unsigned)std::stoi(tmpTCcontent.at(5).c_str(),0,16),
-			     tcid);
+                             (unsigned)std::stoi(tmpTCcontent.at(5).c_str(),0,16));
+      tmpTC.setIndex(tcid);
+      tmpTC.setCmsswIndex(std::make_pair(0,tcid)); //dummy
       TCs_tmp.push_back(tmpTC);
       tmpTC.setIndex(tcid);
       tcid++;
@@ -110,9 +111,9 @@ int SATCParser::parseTClist(const std::string& theInputFile, const TCMap& theTCM
 				 std::get<0>(roz_phi->second), // roverz (w/ magic numbers)
 				 std::get<1>(roz_phi->second), // phi (w/ magic numbers)
 				 50, // dummy layer (although not used for S1)
-				 (unsigned)std::stoi(tc.c_str(),0,16), // energy
-				 tcid); // id_cmssw (FIXME)
-	  
+				 (unsigned)std::stoi(tc.c_str(),0,16)); // energy
+	  // set TC ID
+	  tmpTC.setCmsswIndex(std::make_pair(0,tcid));
 	  // set "firmware-style" module ID"
 	  tmpTC.setIndex(moduleId);
 	  // fill event's TC vector
@@ -137,7 +138,7 @@ int SATCParser::parseTClist(const std::string& theInputFile, const TCMap& theTCM
 
     std::cout << std::endl;
     evt++;
-    TCs_out.push_back(TCs_tmp);
+    TCs_out.emplace_back(TCs_tmp);
     TCs_tmp.clear();
 
   }

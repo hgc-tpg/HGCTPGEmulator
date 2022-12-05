@@ -179,7 +179,7 @@ int HGCTPGEmulatorTester::dumpTCs_fw(const HGCalTriggerCellsPerBx& tcPerBx,
       HGCalTriggerCell TC = evtAndTc.second;
 
       unsigned TCe = TC.energy();
-      unsigned TCid = (TC.index() << 6) + TC.index_cmssw(); // index_cmssw() -> TC address (in module); index() -> module hash
+      unsigned TCid = (TC.index() << 6) + TC.cmsswIndex().second; // index_cmssw() -> TC address (in module); index() -> module hash
       unsigned TCout = (dumpAddresses) ? (TCid << offset_e_) + TCe : TCe;
       std::stringstream sstream;
       if(dumpAddresses)
