@@ -14,7 +14,7 @@ OBJDIR = obj
 OBJ = $(TESTDIR)HGCTPGStage1EmulatorTester.o $(patsubst %$(SRCSUF), %$(OBJSUF), $(SRC))
 
 CC = g++
-CCFLAGS = -std=c++1y -I./ -I../ -I./$(INCLUDEDIR)
+CCFLAGS = -std=c++17 -I./ -I../ -I./$(INCLUDEDIR)
 
 ##########################################################
 
