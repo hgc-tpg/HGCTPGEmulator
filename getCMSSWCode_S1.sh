@@ -1,9 +1,11 @@
 #!/bin/bash
 
 CMSSW_VERSION=${1-CMSSW_12_3_0}
+SCRAMARCH=${2-slc7_amd64_gcc10}
 
 # setup CMS environment to get required C++17 version
-export SCRAM_ARCH=slc7_amd64_gcc10
+source /cvmfs/cms.cern.ch/cmsset_default.sh
+export SCRAM_ARCH=${SCRAMARCH}
 cmsrel ${CMSSW_VERSION}
 cd ${CMSSW_VERSION}/src/
 cmsenv
